@@ -17,17 +17,21 @@ Focus Flow is a clean productivity app for users who want to stay organized with
 - Styling: CSS / component-driven design
 - Deployment: Vercel
 
-## Run Locally
+## Run locally
 ```bash
 npm install
 npm run dev
 ```
 
-## Project Goal
+## Project goal
 To build a calm, motivating workspace that helps users stay productive and consistent without burnout.
 
-## My Contribution
-I focused on creating a clean, practical user experience that feels both modern and genuinely helpful for daily productivity.
+## My contribution
+I focused on creating a clean, practical user experience that feels modern and genuinely helpful for daily productivity.
 
 ## Status
 Active portfolio project
+
+---
+
+Stay focused. Stay calm. Stay productive.
