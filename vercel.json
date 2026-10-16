@@ -1,0 +1,52 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "src/backend",
+      "framework": "fastapi",
+      "installCommand": "pip install -r requirements.txt",
+      "buildCommand": "python -m pip install -r requirements.txt && echo \"backend ready\"",
+      "devCommand": "uvicorn app:app --host 0.0.0.0 --port 8000 --reload",
+      "outputDirectory": ""
+    },
+    "frontend": {
+      "root": "src/frontend",
+      "framework": "vite",
+      "installCommand": "npm ci",
+      "buildCommand": "npm run build",
+      "devCommand": "npm run dev",
+      "outputDirectory": "dist",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "backend",
+          "format": "url",
+          "env": "BACKEND_URL"
+        }
+      ]
+    }
+  },
+  "functions": {
+    "api/chat.ts": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30,
+      "environment": {
+        "OPENAI_API_KEY": "@openai_api_key"
+      }
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
+  ]
+}
