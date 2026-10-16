@@ -26,6 +26,7 @@ import MusicPlayerPanel from "../ui/MusicPlayer";
 import HookBanner from "../ui/HookBanner";
 import DailySchedulePanel from "../ui/DailySchedulePanel";
 import AlarmPanel from "../ui/AlarmPanel";
+import ReminderMonitor from "../common/ReminderMonitor";
 
 export type Section =
   | "home" | "tasks" | "schedule" | "journal" | "reminders"
@@ -246,6 +247,9 @@ export default function Dashboard({ onLogout, username }: DashboardProps) {
       {focusLockActive && (
         <FocusLockMode taskName="Deep Work Session" onExit={() => setFocusLockActive(false)} />
       )}
+
+      {/* ── Background Monitoring ── */}
+      <ReminderMonitor />
 
       {/* ── Hook Banner ── */}
       <HookBanner />

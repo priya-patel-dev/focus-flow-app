@@ -34,39 +34,6 @@ export default function RemindersPanel() {
   const [dateTime, setDateTime] = useState("");
   const [isBirthday, setIsBirthday] = useState(false);
 
-  const triggeredRef = useRef<Set<string>>(new Set());
-
-  // Check reminders every minute
-  useEffect(() => {
-    const check = () => {
-      for (const r of reminders) {
-        const key = r.id.toString();
-        if (triggeredRef.current.has(key)) continue;
-        const ms = Number(r.dateTime) / 1_000_000;
-        if (ms <= Date.now()) {
-          triggeredRef.current.add(key);
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification(`⏰ ${r.title}`, {
-              body: r.isBirthday
-                ? "🎂 Birthday reminder!"
-                : "FocusFlow Reminder",
-            });
-          }
-          toast(`⏰ ${r.title}`, {
-            description: r.isBirthday ? "🎂 Birthday!" : "Reminder triggered",
-          });
-        }
-      }
-    };
-
-    check();
-    const interval = setInterval(check, 60_000);
-    return () => clearInterval(interval);
-  }, [reminders]);
-
   // Request notification permission
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {

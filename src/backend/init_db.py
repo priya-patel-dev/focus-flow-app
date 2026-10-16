@@ -22,7 +22,7 @@ engine = create_engine(
 def init_db():
     """Initialize database tables"""
     Base.metadata.create_all(bind=engine)
-    print("✓ Database tables created")
+    print("Database tables created")
 
 def create_admin_user(username: str = "admin", email: str = "admin@example.com", password: str = "admin123"):
     """Create initial admin user"""
@@ -32,7 +32,7 @@ def create_admin_user(username: str = "admin", email: str = "admin@example.com",
     # Check if admin already exists
     existing_admin = db.query(User).filter(User.role == "admin").first()
     if existing_admin:
-        print(f"✗ Admin user already exists: {existing_admin.username}")
+        print(f"Admin user already exists: {existing_admin.username}")
         return
     
     # Create admin user

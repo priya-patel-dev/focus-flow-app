@@ -148,7 +148,7 @@ export function useGetTasks() {
         title: t.title,
         description: t.description || "",
         isComplete: t.isComplete,
-        createdAt: BigInt(new Date(t.createdAt).getTime()),
+        createdAt: BigInt(new Date(t.createdAt).getTime()) * BigInt(1_000_000),
       }));
     },
     enabled: !!getToken(),
@@ -387,7 +387,7 @@ export function useGetReminders() {
         title: r.title,
         isBirthday: r.isBirthday ?? r.is_birthday,
         isTriggered: r.isTriggered ?? r.is_triggered,
-        dateTime: BigInt(new Date(r.dateTime ?? r.date_time).getTime()),
+        dateTime: BigInt(new Date(r.dateTime ?? r.date_time).getTime()) * BigInt(1_000_000),
       }));
     },
     enabled: !!getToken(),
