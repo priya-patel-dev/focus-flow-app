@@ -773,10 +773,18 @@ def _generate_response_for_event(kind: str, payload: str) -> str:
     
     return responses.get(kind, "Got it! Keep going, you're doing great.")
 
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "message": "Focus Flow Backend API is running successfully!",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
+
 # Health check endpoint
 @app.get("/api/health")
 def health_check():
-    """Health check endpoint"""
     return {"status": "ok"}
 
 if __name__ == "__main__":
