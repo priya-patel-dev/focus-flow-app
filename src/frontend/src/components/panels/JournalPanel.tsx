@@ -16,7 +16,7 @@ import {
 } from "../../utils/assistant";
 import { useAgentStore } from "../../lib/agentStore";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api" : "http://localhost:8000/api");
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
 
 interface JournalProps {
   userId: string;

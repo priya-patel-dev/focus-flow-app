@@ -50,7 +50,7 @@ export interface UserProfile {
 
 // ─── API Helper ─────────────────────────────────────────────────────────────
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api" : "http://localhost:8000/api");
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
 
 function getToken() {
   return localStorage.getItem("authToken");

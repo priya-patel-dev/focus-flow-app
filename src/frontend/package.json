@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:skip-bindings": "vite build && pnpm copy:env",
-    "build": "vite build && pnpm copy:env",
+    "build:skip-bindings": "vite build",
+    "build": "vite build",
     "copy:env": "cp env.json dist/",
     "typecheck": "tsc --noEmit --pretty",
     "check": "biome check src",

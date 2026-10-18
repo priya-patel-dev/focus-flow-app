@@ -13,7 +13,7 @@ import { useMentorPresence } from "./hooks/useMentorPresence";
 import { AnimatePresence } from "motion/react";
 import { Bot } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api" : "http://localhost:8000/api");
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
 
 export default function App() {
   const queryClient = useQueryClient();
@@ -94,12 +94,18 @@ export default function App() {
         body: JSON.stringify({ username: loginUsername, password }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.detail || "Login failed" };
+      let errorData: any = {};
+      try {
+        errorData = await response.json();
+      } catch {
+        // response might not be json
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, error: errorData.detail || `Server error (${response.status})` };
+      }
+
+      const data = errorData;
       localStorage.setItem("authToken", data.access_token);
       localStorage.setItem("username", loginUsername);
       
@@ -110,8 +116,9 @@ export default function App() {
       setUsername(loginUsername);
       setIsLoggedIn(true);
       return { success: true };
-    } catch (error) {
-      return { success: false, error: "Network error" };
+    } catch (error: any) {
+      console.error("Login error:", error);
+      return { success: false, error: error?.message || "Network error" };
     }
   };
 
@@ -130,12 +137,18 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.detail || "Registration failed" };
+      let errorData: any = {};
+      try {
+        errorData = await response.json();
+      } catch {
+        // response might not be json
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, error: errorData.detail || `Registration error (${response.status})` };
+      }
+
+      const data = errorData;
       localStorage.setItem("authToken", data.access_token);
       localStorage.setItem("username", regUsername);
       
@@ -146,8 +159,9 @@ export default function App() {
       setUsername(regUsername);
       setIsLoggedIn(true);
       return { success: true };
-    } catch (error) {
-      return { success: false, error: "Network error" };
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      return { success: false, error: error?.message || "Network error" };
     }
   };
 
