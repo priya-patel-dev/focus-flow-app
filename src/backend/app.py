@@ -634,24 +634,45 @@ Rules:
             if reminders:
                 system_prompt += f"\n\nUpcoming reminders: {', '.join([r['title'] for r in reminders])}"
     
-    # Call Groq API
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    messages = [{"role": "system", "content": system_prompt}]
-    history = request.conversationHistory if request.conversationHistory else []
-    for msg in history[-10:]:
-        messages.append({"role": msg.role, "content": msg.text})
-    messages.append({"role": "user", "content": request.prompt})
+    # Support both Gemini and Groq API keys
+    gemini_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("VITE_GEMINI_API_KEY", "").strip()
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
 
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": messages,
-        "temperature": 0.7,
-        "max_tokens": 2000
-    }
+    if gemini_key:
+        url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {gemini_key}",
+            "Content-Type": "application/json"
+        }
+        messages = [{"role": "system", "content": system_prompt}]
+        history = request.conversationHistory if request.conversationHistory else []
+        for msg in history[-10:]:
+            messages.append({"role": msg.role, "content": msg.text})
+        messages.append({"role": "user", "content": request.prompt})
+
+        payload = {
+            "model": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+            "messages": messages,
+            "temperature": 0.7
+        }
+    else:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        messages = [{"role": "system", "content": system_prompt}]
+        history = request.conversationHistory if request.conversationHistory else []
+        for msg in history[-10:]:
+            messages.append({"role": msg.role, "content": msg.text})
+        messages.append({"role": "user", "content": request.prompt})
+
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": messages,
+            "temperature": 0.7,
+            "max_tokens": 2000
+        }
     
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=10)
