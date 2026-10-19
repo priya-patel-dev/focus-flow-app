@@ -139,8 +139,8 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
     
     # Generate token
     access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=timedelta(days=1)
+        data={"sub": str(user.id), "username": user.username, "email": user.email, "role": user.role},
+        expires_delta=timedelta(days=7)
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
@@ -160,8 +160,8 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     
     # Generate token
     access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=timedelta(days=1)
+        data={"sub": str(user.id), "username": user.username, "email": user.email, "role": user.role},
+        expires_delta=timedelta(days=7)
     )
     
     return {"access_token": access_token, "token_type": "bearer"}

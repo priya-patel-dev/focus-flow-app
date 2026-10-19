@@ -75,12 +75,9 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
   const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
   if (!res.ok) {
-    // If token is invalid/expired, clear it and reload to trigger re-login
+    // If token is invalid/expired
     if (res.status === 401) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("username");
-      window.location.reload();
-      throw new Error("Session expired. Please log in again.");
+      throw new Error("Session expired or unauthorized.");
     }
     let msg = "API Error";
     try {

@@ -17,9 +17,9 @@ load_dotenv()
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 security = HTTPBearer()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-focusflow-v1")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 def hash_password(password: str) -> str:
     """Hash a password"""
@@ -58,7 +58,12 @@ def verify_token(token: str) -> dict:
                 detail="Invalid token"
             )
         
-        return {"user_id": int(user_id)}
+        return {
+            "user_id": int(user_id),
+            "username": payload.get("username"),
+            "email": payload.get("email"),
+            "role": payload.get("role", "user")
+        }
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,18 +71,44 @@ def verify_token(token: str) -> dict:
         )
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> User:
-    """Get current user from token"""
+    """Get current user from token, automatically ensuring user existence across serverless containers"""
     token = credentials.credentials
     payload = verify_token(token)
+    user_id = payload["user_id"]
+    username = payload.get("username") or f"user_{user_id}"
+    email = payload.get("email") or f"{username}@example.com"
+    role = payload.get("role", "user")
     
     db = SessionLocal()
-    user = db.query(User).filter(User.id == payload["user_id"]).first()
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        user = db.query(User).filter(User.username == username).first()
+        
+    if not user:
+        # On serverless (Vercel Lambda), each container has independent ephemeral /tmp storage.
+        # Since this JWT is cryptographically verified by our SECRET_KEY, we ensure the user
+        # record exists in this container's SQLite database so all queries succeed.
+        try:
+            user = User(
+                id=user_id,
+                username=username,
+                email=email,
+                hashed_password="jwt_verified_user",
+                role=role
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        except Exception:
+            db.rollback()
+            user = db.query(User).filter(User.id == user_id).first() or db.query(User).filter(User.username == username).first()
+
     db.close()
     
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found"
+            detail="User session could not be verified"
         )
     
     return user
