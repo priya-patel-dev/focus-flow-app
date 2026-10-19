@@ -664,7 +664,7 @@ Rules:
         messages.append({"role": "user", "content": request.prompt})
 
         payload = {
-            "model": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+            "model": os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
             "messages": messages,
             "temperature": 0.7
         }
@@ -681,7 +681,7 @@ Rules:
         messages.append({"role": "user", "content": request.prompt})
 
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
             "messages": messages,
             "temperature": 0.7,
             "max_tokens": 2000
