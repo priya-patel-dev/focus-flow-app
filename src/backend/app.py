@@ -727,14 +727,21 @@ Rules:
     except requests.exceptions.RequestException as e:
         err_msg = str(e)
         if hasattr(e, 'response') and e.response is not None:
-            err_msg += f" (response: {e.response.text})"
+            try:
+                err_json = e.response.json()
+                if isinstance(err_json, list) and len(err_json) > 0:
+                    err_json = err_json[0]
+                api_err = err_json.get("error", {}).get("message")
+                if api_err:
+                    err_msg = api_err
+                else:
+                    err_msg = e.response.text[:120]
+            except Exception:
+                err_msg = e.response.text[:120]
         print(f"AI API error: {err_msg}")
         
-        # Fallback response if the API is completely unreachable
-        if not gemini_key and not groq_key:
-            fallback_msg = "Please add GEMINI_API_KEY in your Vercel backend environment variables to activate AI responses."
-        else:
-            fallback_msg = f"I'm having a bit of trouble connecting to my neural network right now ({err_msg[:80]}), but I'm still here cheering for you!"
+        # Fallback response with exact diagnostic
+        fallback_msg = f"AI Error: {err_msg}. Please check your API key in Vercel settings (or get a fresh key from aistudio.google.com/apikey)."
         
         # Add the fallback to DB so it doesn't break the flow
         user_msg = AssistantMessage(
