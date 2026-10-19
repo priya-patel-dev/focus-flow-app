@@ -118,7 +118,7 @@ export default function App() {
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
-      return { success: false, error: error?.message || "Network error" };
+      return { success: false, error: `${error?.message || "Network error"} (target: ${API_URL})` };
     }
   };
 
@@ -161,7 +161,7 @@ export default function App() {
       return { success: true };
     } catch (error: any) {
       console.error("Registration error:", error);
-      return { success: false, error: error?.message || "Network error" };
+      return { success: false, error: `${error?.message || "Network error"} (target: ${API_URL})` };
     }
   };
 
