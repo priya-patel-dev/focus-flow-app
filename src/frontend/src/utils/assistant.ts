@@ -1,3 +1,5 @@
+import { API_URL } from "./apiUrl";
+
 export interface AssistantMessage {
   id: string | bigint;
   role: "user" | "assistant";
@@ -115,7 +117,7 @@ export async function queryAssistant(
   conversationHistory?: AssistantMessage[],
   context?: AssistantContext,
 ): Promise<string> {
-  const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
+  const apiUrl = API_URL;
 
   const token = localStorage.getItem("authToken");
   if (!token) {

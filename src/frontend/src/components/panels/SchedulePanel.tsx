@@ -31,7 +31,7 @@ import {
   todayStr,
 } from "../../utils/localStorage";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
+import { API_URL } from "../../utils/apiUrl";
 
 interface ScheduleProps {
   userId: string;

@@ -12,8 +12,7 @@ import { useGetUserSettings, BackgroundType } from "./hooks/useQueries";
 import { useMentorPresence } from "./hooks/useMentorPresence";
 import { AnimatePresence } from "motion/react";
 import { Bot } from "lucide-react";
-
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:8000/api" : "https://focus-flow-app-ashy.vercel.app/api");
+import { API_URL } from "./utils/apiUrl";
 
 export default function App() {
   const queryClient = useQueryClient();
