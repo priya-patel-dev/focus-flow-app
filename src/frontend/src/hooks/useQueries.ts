@@ -552,9 +552,10 @@ export function useChat() {
   const queryClient = useQueryClient();
   return useMutation<{ message: string }, Error, { prompt: string; type?: "explorer" | "mentor"; context?: Record<string, any>; conversationHistory?: any[] }>({
     mutationFn: async ({ prompt, type, context, conversationHistory }) => {
+      const geminiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
       const res = await apiFetch("/assistant-query", {
         method: "POST",
-        body: JSON.stringify({ prompt, type, context, conversationHistory }),
+        body: JSON.stringify({ prompt, type, context, conversationHistory, apiKey: geminiKey }),
       });
       return { message: res.response };
     },

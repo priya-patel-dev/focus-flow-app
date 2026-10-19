@@ -124,7 +124,7 @@ export async function queryAssistant(
     throw new Error("Not authenticated");
   }
 
-  // Call backend endpoint which proxies to Google Gemini
+  const geminiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
   const response = await fetch(`${apiUrl}/assistant-query`, {
     method: "POST",
     headers: {
@@ -135,6 +135,7 @@ export async function queryAssistant(
       prompt,
       context,
       conversationHistory,
+      apiKey: geminiKey,
     }),
   });
 

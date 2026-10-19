@@ -71,6 +71,7 @@ class AssistantQueryRequest(BaseModel):
     type: str = "explorer"  # "explorer" or "mentor"
     context: Optional[dict] = None
     conversationHistory: Optional[List[AssistantMessageInput]] = None
+    apiKey: Optional[str] = None
 
 class AssistantQueryResponse(BaseModel):
     response: str
@@ -647,8 +648,12 @@ Rules:
             if reminders:
                 system_prompt += f"\n\nUpcoming reminders: {', '.join([r['title'] for r in reminders])}"
     
-    # Support both Gemini and Groq API keys
-    gemini_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("VITE_GEMINI_API_KEY", "").strip()
+    # Support both Gemini and Groq API keys (from request payload, env, or frontend)
+    gemini_key = (
+        (request.apiKey or "").strip()
+        or os.getenv("GEMINI_API_KEY", "").strip()
+        or os.getenv("VITE_GEMINI_API_KEY", "").strip()
+    )
     groq_key = os.getenv("GROQ_API_KEY", "").strip()
 
     if gemini_key:
@@ -721,10 +726,15 @@ Rules:
     
     except requests.exceptions.RequestException as e:
         err_msg = str(e)
-        print(f"Groq API error: {err_msg}")
+        if hasattr(e, 'response') and e.response is not None:
+            err_msg += f" (response: {e.response.text})"
+        print(f"AI API error: {err_msg}")
         
         # Fallback response if the API is completely unreachable
-        fallback_msg = "I'm having a bit of trouble connecting to my neural network right now, but I'm still here cheering for you!"
+        if not gemini_key and not groq_key:
+            fallback_msg = "Please add GEMINI_API_KEY in your Vercel backend environment variables to activate AI responses."
+        else:
+            fallback_msg = f"I'm having a bit of trouble connecting to my neural network right now ({err_msg[:80]}), but I'm still here cheering for you!"
         
         # Add the fallback to DB so it doesn't break the flow
         user_msg = AssistantMessage(
